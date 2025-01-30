@@ -1,4 +1,4 @@
-name: deploy-review-command
+name: github-deploy-review-command
 on:
   repository_dispatch:
     types: [github-deploy-review-command]
