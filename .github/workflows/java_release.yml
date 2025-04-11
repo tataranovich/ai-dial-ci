@@ -117,10 +117,7 @@ jobs:
           gpr_username: ${{ github.actor }}
           gpr_password: ${{ secrets.GITHUB_TOKEN }}
           image_extra_aliases: |
-            ${{ env.IMAGE_NAME }}:${{ needs.calculate_version.outputs.next_version }}
-            ${{ github.ref == 'refs/heads/development' && format('{0}:{1}', env.IMAGE_NAME, 'development') || ''}}
             ${{ github.ref == 'refs/heads/development' && format('{0}/{1}:{2}', 'ghcr.io', env.IMAGE_NAME, 'development') || ''}}
-            ${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is_latest == 'true' && format('{0}:{1}', env.IMAGE_NAME, 'latest') || ''}}
             ${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is_latest == 'true' && format('{0}/{1}:{2}', 'ghcr.io', env.IMAGE_NAME, 'latest') || ''}}
       - uses: gradle/actions/dependency-submission@0bdd871935719febd78681f197cd39af5b6e16a6 # v4.2.2
       - uses: epam/ai-dial-ci/actions/publish_tag_release@1.12.1
