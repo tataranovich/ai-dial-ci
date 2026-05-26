@@ -8,9 +8,9 @@
 #   - application                             Application name to deploy (e.g. "ai-dial-chat", "ai-dial-admin", etc)
 #   - (optional) test-applications            Comma-separated list of applications to run E2E tests against, with optional test repository parameter.
 #                                             Format: application[:test-repository],application[:test-repository]
-#                                             If test repository is omitted, epam/ai-dial-chat will be used
+#                                             If test repository is omitted, tataranovich/ai-dial-chat will be used
 #                                             Default: chat (with default test repository)
-#                                             Example: chat,admin:epam/ai-dial-admin-tests
+#                                             Example: chat,admin:tataranovich/ai-dial-admin-tests
 #   - (optional) environment                  GitHub environment for this run (secrets/variables). Default - `dial-review`
 # - Unnamed:
 #   - (optional) skip-e2e                     If present, E2E tests will be skipped
@@ -149,7 +149,7 @@ jobs:
         id: test-applications
         run: |
           INPUT="${{ github.event.client_payload.slash_command.args.named.test-applications || 'chat' }}"
-          DEFAULT_REPO="epam/ai-dial-chat"
+          DEFAULT_REPO="tataranovich/ai-dial-chat"
           # Parse comma-separated items, each can be "application" or "application:repo"
           # Output: [{"application": "...", "test-repository": "..."}]
           JSON=$(echo "$INPUT" | jq -Rc --arg default "$DEFAULT_REPO" '

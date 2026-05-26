@@ -44,7 +44,7 @@ read -p "Enter the next version tag or keep empty to apply suggested ($suggested
 next_version=${next_version:-$suggested_version}
 
 # Define the search pattern
-search_pattern="epam/ai-dial-ci/"
+search_pattern="tataranovich/ai-dial-ci/"
 
 # Find all .yml and .yaml files and replace the version tag
 find . -type f \( -name "*.yml" -o -name "*.yaml" \) -exec sed -i "s|\(${search_pattern}[^@]*@\)[^ ]*|\1${next_version}|g" {} +
