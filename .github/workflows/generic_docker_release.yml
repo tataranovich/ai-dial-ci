@@ -141,11 +141,7 @@ jobs:
           remove-ruby: "true"
           docker-cleanup: "true"
           set-tmpdir: "true"
-<<<<<<< HEAD
       - uses: tataranovich/ai-dial-ci/actions/generate_release_notes@main
-=======
-      - uses: epam/ai-dial-ci/actions/generate_release_notes@4.4.0
->>>>>>> 437caf0227758d568526425775f3b28331fbdc37
         with:
           latest-tag: ${{ needs.calculate_version.outputs.latest-stable-tag }}
           use-merge-base: ${{ needs.calculate_version.outputs.changelog-mode == 'merge-base' }}
@@ -153,11 +149,7 @@ jobs:
         with:
           lfs: true
           token: ${{ secrets.ACTIONS_BOT_TOKEN }}
-<<<<<<< HEAD
       - uses: tataranovich/ai-dial-ci/actions/build_docker@main
-=======
-      - uses: epam/ai-dial-ci/actions/build_docker@4.4.0
->>>>>>> 437caf0227758d568526425775f3b28331fbdc37
         with:
           ghcr-username: ${{ github.actor }}
           ghcr-password: ${{ secrets.ACTIONS_BOT_TOKEN }}
@@ -176,11 +168,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.next-version || 'development' }}
             ${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is-latest == 'true' && format('{0}:{1}', env.IMAGE_NAME, 'latest') || '' }}
             ${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is-latest == 'true' && format('{0}/{1}:{2}', 'ghcr.io', env.IMAGE_NAME, 'latest') || '' }}
-<<<<<<< HEAD
       - uses: tataranovich/ai-dial-ci/actions/publish_tag_release@main
-=======
-      - uses: epam/ai-dial-ci/actions/publish_tag_release@4.4.0
->>>>>>> 437caf0227758d568526425775f3b28331fbdc37
         if: ${{ startsWith(github.ref, 'refs/heads/release-') }}
         with:
           git-user-name: ${{ vars.ACTIONS_BOT_NAME || 'ai-dial-actions' }}

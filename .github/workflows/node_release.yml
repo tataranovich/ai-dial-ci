@@ -141,11 +141,7 @@ jobs:
       release-line: ${{ steps.semantic_versioning.outputs.release-line }}
       changelog-mode: ${{ steps.semantic_versioning.outputs.changelog-mode }}
     steps:
-<<<<<<< HEAD
       - uses: tataranovich/ai-dial-ci/actions/semantic_versioning@main
-=======
-      - uses: epam/ai-dial-ci/actions/semantic_versioning@4.4.0
->>>>>>> 437caf0227758d568526425775f3b28331fbdc37
         id: semantic_versioning
         with:
           promote: ${{ inputs.promote }}
