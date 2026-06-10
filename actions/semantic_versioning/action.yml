@@ -150,13 +150,13 @@ runs:
           if [ $(git tag | grep -cE "^${DEVELOPMENT_LINE}\.") -gt 0 ]; then
             if [[ ${LATEST_STABLE_TAG} =~ ^${DEVELOPMENT_LINE}\. ]]; then
               CURRENT_VERSION="${LATEST_STABLE_TAG}"
+              DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
+              NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --minor --pre-release "-dev.${DEV_N}")
             elif [[ ${LATEST_RC_TAG} =~ ^${DEVELOPMENT_LINE}\. ]]; then
               CURRENT_VERSION="${LATEST_RC_TAG}"
-            else
-              CURRENT_VERSION=""
+              DEV_N=$(git rev-list --count "${LATEST_RC_TAG}..HEAD")
+              NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --minor --pre-release "-dev.${DEV_N}")
             fi
-            DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
-            NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --minor --pre-release "-dev.${DEV_N}")
           else
             CURRENT_VERSION="${DEVELOPMENT_LINE}.0.0"
             DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
