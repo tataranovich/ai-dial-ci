@@ -145,9 +145,9 @@ runs:
           esac
 
         elif [[ "${CURRENT_BRANCH}" =~ ^development- ]]; then
-          DEVELOPMENT_LINE="${CURRENT_BRANCH##development-}" # e.g. "1.0"
+          DEVELOPMENT_LINE="$(echo ${CURRENT_BRANCH##development-} | cut -d. -f1)"
           # Take into account only major version since minor we will bump by CI
-          if [ $(git tag | grep -cE "^$(echo $DEVELOPMENT_LINE | cut -d. -f1)\.") -gt 0 ]; then
+          if [ $(git tag | grep -cE "^${DEVELOPMENT_LINE}\.") -gt 0 ]; then
             CURRENT_VERSION="${LATEST_STABLE_TAG}"
             DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
             NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --minor --pre-release "-dev.${DEV_N}")
