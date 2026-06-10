@@ -83,7 +83,7 @@ jobs:
         target: [chat, overlay]
       fail-fast: false
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: ${{ inputs.test-repository }}
           ref: ${{ inputs.test-branch }}
@@ -203,7 +203,7 @@ jobs:
           allure generate ./apps/chat-e2e/allure-${{ matrix.target }}-results -o ./apps/chat-e2e/allure-${{ matrix.target }}-report --clean
         shell: bash
       - name: Upload Allure Report
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: ${{ !cancelled() }}
         with:
           name: "${{ inputs.report-prefix }}-${{ matrix.target }}"
