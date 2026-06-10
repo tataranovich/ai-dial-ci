@@ -146,12 +146,13 @@ runs:
 
         elif [[ "${CURRENT_BRANCH}" =~ ^development- ]]; then
           DEVELOPMENT_LINE="${CURRENT_BRANCH##development-}" # e.g. "1.0"
-          if [ $(git tag | grep -cE "^$(echo $DEVELOPMENT_LINE | awk -F. '{print $1"\."$2}')") -gt 0 ]; then
+          # Take into account only major version since minor we will bump by CI
+          if [ $(git tag | grep -cE "^$(echo $DEVELOPMENT_LINE | cut -d. -f1)\.") -gt 0 ]; then
             CURRENT_VERSION="${LATEST_STABLE_TAG}"
             DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
             NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --minor --pre-release "-dev.${DEV_N}")
           else
-            CURRENT_VERSION="${DEVELOPMENT_LINE}.0"
+            CURRENT_VERSION="${DEVELOPMENT_LINE}.0.0"
             DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
             NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --pre-release "-dev.${DEV_N}")
           fi
