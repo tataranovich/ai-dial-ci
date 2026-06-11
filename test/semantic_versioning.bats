@@ -14,13 +14,16 @@ setup_file() {
 setup() {
   export COMMIT_COUNTER=0
   export LAST_COMMIT_SHA=""
-  export INPUT_FILTER_VERSION=""
 }
 
 # Helper functions
 
+debug() {
+  echo "# DEBUG ${@}" >&3
+}
+
 commit_msg() {
-  local msg="$1"
+  local msg="${1}"
   COMMIT_COUNTER=$((COMMIT_COUNTER + 1))
   mkdir -p commits
   printf "%s\n" "${msg}" >"commits/${COMMIT_COUNTER}.txt"
@@ -30,12 +33,12 @@ commit_msg() {
 }
 
 cherry_pick_commit() {
-  local sha="$1"
+  local sha="${1}"
   git cherry-pick -x --no-edit "${sha}" >/dev/null
 }
 
 init_dummy_repo() {
-  local repo_dir="$1"
+  local repo_dir="${1}"
   mkdir -p "${repo_dir}"
   cd "${repo_dir}"
   git init -q --initial-branch=development
@@ -47,13 +50,13 @@ init_dummy_repo() {
 }
 
 read_output_key() {
-  local key="$1"
+  local key="${1}"
   grep "^${key}=" "${BATS_TEST_TMPDIR}/calc_output.txt" | tail -1 | cut -d= -f2-
 }
 
 run_calc() {
-  local promote="$1"
-  local filter_version="$2"
+  local promote="${1}"
+  local filter_version="${2}"
 
   local GITHUB_OUTPUT="${BATS_TEST_TMPDIR}/calc_output.txt"
   local GITHUB_STEP_SUMMARY="${BATS_TEST_TMPDIR}/calc_summary.md"
@@ -82,16 +85,16 @@ run_calc() {
 }
 
 assert_calc() {
-  local scenario="$1"
-  local branch="$2"
-  local promote="$3"
-  local expected_next="$4"
-  local expected_is_rc="$5"
-  local expected_is_release="$6"
-  local expected_is_latest="$7"
-  local expected_release_line="$8"
-  local expected_changelog_mode="$9"
-  local filter_version="$10"
+  local scenario="${1}"
+  local branch="${2}"
+  local promote="${3}"
+  local expected_next="${4}"
+  local expected_is_rc="${5}"
+  local expected_is_release="${6}"
+  local expected_is_latest="${7}"
+  local expected_release_line="${8}"
+  local expected_changelog_mode="${9}"
+  local filter_version="${10}"
 
   git checkout -q "${branch}"
   run_calc "${promote}" "${filter_version}"
@@ -281,7 +284,7 @@ assert_calc() {
 
   git checkout -q development
   commit_msg "feat: 3"
-  assert_calc "S11" "development" "false" "0.3.0-dev.2" "false" "false" "false" "" "tag" "0\.[0-9]"
+  assert_calc "S11" "development" "false" "0.3.0-dev.2" "false" "false" "false" "" "tag" "0\.[0-9]+"
 
   git checkout -q -b development-1.0
   commit_msg "feat: 4"
@@ -291,7 +294,7 @@ assert_calc() {
   commit_msg "feat: 5"
   commit_msg "feat: 6"
   commit_msg "feat: 7"
-  assert_calc "S13" "development" "false" "0.3.0-dev.5" "false" "false" "false" "" "tag" "0\.[0-9]"
+  assert_calc "S13" "development" "false" "0.3.0-dev.5" "false" "false" "false" "" "tag" "0\.[0-9]+"
 
   git checkout -q development-1.0
   commit_msg "feat: 8"
@@ -307,20 +310,20 @@ assert_calc() {
 
   git checkout -q development
   git checkout -q -b release-0.3
-  assert_calc "S17" "release-0.3" "false" "0.3.0-rc.0" "true" "false" "false" "0.3" "tag" "0\.[0-9]"
+  assert_calc "S17" "release-0.3" "false" "0.3.0-rc.0" "true" "false" "false" "0.3" "tag" "0\.[0-9]+"
   git tag 0.3.0-rc.0
 
   git checkout -q development
   commit_msg "fix: 7"
   sha_fix7="${LAST_COMMIT_SHA}"
-  assert_calc "S18" "development" "false" "0.4.0-dev.1" "false" "false" "false" "" "tag" "0\.[0-9]"
+  assert_calc "S18" "development" "false" "0.4.0-dev.1" "false" "false" "false" "" "tag" "0\.[0-9]+"
 
   git checkout -q release-0.3
   cherry_pick_commit "${sha_fix7}"
-  assert_calc "S19" "release-0.3" "false" "0.3.0-rc.1" "true" "false" "false" "0.3" "tag" "0\.[0-9]"
+  assert_calc "S19" "release-0.3" "false" "0.3.0-rc.1" "true" "false" "false" "0.3" "tag" "0\.[0-9]+"
   git tag 0.3.0-rc.1
 
-  assert_calc "S20" "release-0.3" "true" "0.3.0" "false" "true" "false" "0.3" "merge-base" "0\.[0-9]"
+  assert_calc "S20" "release-0.3" "true" "0.3.0" "false" "true" "false" "0.3" "merge-base" "0\.[0-9]+"
   commit_msg "[skip ci] Update version"
   git tag 0.3.0
 
@@ -359,13 +362,13 @@ assert_calc() {
 
   git checkout -q development
   commit_msg "feat: 12"
-  assert_calc "S28" "development" "false" "0.4.0-dev.2" "false" "false" "false" "" "tag" "0\.[0-9]"
+  assert_calc "S28" "development" "false" "0.4.0-dev.2" "false" "false" "false" "" "tag" "0\.[0-9]+"
 
   git checkout -q -b release-0.4
-  assert_calc "S29" "release-0.4" "false" "0.4.0-rc.0" "true" "false" "false" "0.4" "tag" "0\.[0-9]"
+  assert_calc "S29" "release-0.4" "false" "0.4.0-rc.0" "true" "false" "false" "0.4" "tag" "0\.[0-9]+"
   git tag 0.4.0-rc.0
 
-  assert_calc "S30" "release-0.4" "true" "0.4.0" "false" "true" "false" "0.4" "merge-base" "0\.[0-9]"
+  assert_calc "S30" "release-0.4" "true" "0.4.0" "false" "true" "false" "0.4" "merge-base" "0\.[0-9]+"
   commit_msg "[skip ci] Update version"
   git tag 0.4.0
 
