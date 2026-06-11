@@ -444,4 +444,41 @@ assert_calc() {
   git checkout -q -b release-0.3
   assert_calc "S12" "release-0.3" "false" "0.3.0-rc.0" "true" "false" "false" "0.3" "tag" "0\.[0-9]+"
   git tag 0.3.0-rc.0
+
+  git checkout -q development-0.x
+  commit_msg "fix: 5"
+  sha_fix5="${LAST_COMMIT_SHA}"
+  assert_calc "S13" "development-0.x" "false" "0.4.0-dev.1" "false" "false" "false" "" "tag" "0\.[0-9]+"
+
+  git checkout -q release-0.3
+  cherry_pick_commit "${sha_fix5}"
+  assert_calc "S14" "release-0.3" "false" "0.3.0-rc.1" "true" "false" "false" "0.3" "tag" "0\.[0-9]+"
+  git tag 0.3.0-rc.1
+
+  assert_calc "S15" "release-0.3" "true" "0.3.0" "false" "true" "false" "0.3" "merge-base" "0\.[0-9]+"
+  commit_msg "[skip ci] Update version"
+  git tag 0.3.0
+
+  git checkout -q development-0.x
+  commit_msg "fix: 6"
+  sha_fix6="${LAST_COMMIT_SHA}"
+  assert_calc "S19" "development-0.x" "false" "0.4.0-dev.2" "false" "false" "false" "" "tag" "0\.[0-9]+"
+
+  git checkout -q release-0.3
+  cherry_pick_commit "${sha_fix6}"
+  assert_calc "S20" "release-0.3" "false" "0.3.1" "false" "true" "false" "0.3" "tag" "0\.[0-9]+"
+  git tag 0.3.1
+
+  git checkout -q development
+  commit_msg "feat: 7"
+  commit_msg "feat: 8"
+  assert_calc "S21" "development" "false" "1.1.0-dev.3" "false" "false" "false" "" "tag"
+
+  git checkout -q -b release-1.1
+  assert_calc "S22" "release-1.1" "false" "1.1.0-rc.0" "true" "false" "false" "1.1" "tag"
+  git tag 1.1.0-rc.0
+
+  assert_calc "S23" "release-1.1" "true" "1.1.0" "false" "true" "true" "1.1" "merge-base"
+  commit_msg "[skip ci] Update version"
+  git tag 1.1.0
 }
