@@ -388,8 +388,8 @@ assert_calc() {
   git tag 1.2.0
 }
 
-@test "Swap development lines" {
-  init_dummy_repo "${BATS_TEST_TMPDIR}/swap-dev-lines"
+@test "Swap development branches" {
+  init_dummy_repo "${BATS_TEST_TMPDIR}/swap-dev-branches"
 
   commit_msg "chore: initial commit"
   assert_calc "S0" "development" "false" "0.1.0-dev.1" "false" "false" "false" "" "tag"
