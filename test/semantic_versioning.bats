@@ -387,3 +387,61 @@ assert_calc() {
   commit_msg "[skip ci] Update version"
   git tag 1.2.0
 }
+
+@test "Swap development lines" {
+  init_dummy_repo "${BATS_TEST_TMPDIR}/swap-dev-lines"
+
+  commit_msg "chore: initial commit"
+  assert_calc "S0" "development" "false" "0.1.0-dev.1" "false" "false" "false" "" "tag"
+
+  commit_msg "feat: 1"
+  assert_calc "S1" "development" "false" "0.1.0-dev.2" "false" "false" "false" "" "tag"
+
+  git checkout -q -b release-0.1
+  assert_calc "S2" "release-0.1" "false" "0.1.0-rc.0" "true" "false" "false" "0.1" "tag"
+  commit_msg "[skip ci] Update version"
+  git tag 0.1.0-rc.0
+
+  assert_calc "S3" "release-0.1" "true" "0.1.0" "false" "true" "true" "0.1" "merge-base"
+  commit_msg "[skip ci] Update version"
+  git tag 0.1.0
+
+  git checkout -q development
+  commit_msg "ci: filter 0.x versions"
+  assert_calc "S4" "development" "false" "0.2.0-dev.1" "false" "false" "false" "" "tag" "0\.[0-9]+"
+
+  git checkout -q -b development-1.x
+  commit_msg "feat: 3"
+  assert_calc "S5" "development-1.x" "false" "1.0.0-dev.2" "false" "false" "false" "" "tag"
+
+  git checkout -q -b release-1.0
+  assert_calc "S6" "release-1.0" "false" "1.0.0-rc.0" "true" "false" "false" "1.0" "tag"
+  git tag 1.0.0-rc.0
+
+  assert_calc "S7" "release-1.0" "true" "1.0.0" "false" "true" "true" "1.0" "merge-base"
+  commit_msg "[skip ci] Update version"
+  git tag 1.0.0
+
+  git checkout -q development
+  git checkout -q -b release-0.2
+  assert_calc "S8" "release-0.2" "false" "0.2.0-rc.0" "true" "false" "false" "0.2" "tag" "0\.[0-9]+"
+  git tag 0.2.0-rc.0
+
+  assert_calc "S9" "release-0.2" "true" "0.2.0" "false" "true" "false" "0.2" "merge-base" "0\.[0-9]+"
+  commit_msg "[skip ci] Update version"
+  git tag 0.2.0
+
+  git branch -q -m development development-0.x
+  git branch -q -m development-1.x development
+  git checkout -q development
+  commit_msg "feat: 4"
+  assert_calc "S10" "development" "false" "1.1.0-dev.1" "false" "false" "false" "" "tag"
+
+  git checkout -q development-0.x
+  commit_msg "feat: 5"
+  assert_calc "S11" "development-0.x" "false" "0.3.0-dev.1" "false" "false" "false" "" "tag" "0\.[0-9]+"
+
+  git checkout -q -b release-0.3
+  assert_calc "S12" "release-0.3" "false" "0.3.0-rc.0" "true" "false" "false" "0.3" "tag" "0\.[0-9]+"
+  git tag 0.3.0-rc.0
+}

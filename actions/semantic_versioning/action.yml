@@ -145,22 +145,22 @@ runs:
           esac
 
         elif [[ "${CURRENT_BRANCH}" =~ ^development- ]]; then
-          DEVELOPMENT_LINE="$(echo ${CURRENT_BRANCH##development-} | cut -d. -f1)"
+          DEV_LINE="$(echo ${CURRENT_BRANCH##development-} | cut -d. -f1)"
           # Take into account only major version since minor we will bump by CI
-          if [ $(git tag | grep -cE "^${DEVELOPMENT_LINE}\.") -gt 0 ]; then
-            if [[ ${LATEST_STABLE_TAG} =~ ^${DEVELOPMENT_LINE}\. ]]; then
+          if [ $(git tag | grep -cE "^${DEV_LINE}\.") -gt 0 ]; then
+            if [[ ${LATEST_STABLE_TAG} =~ ^${DEV_LINE}\. ]]; then
               CURRENT_VERSION="${LATEST_STABLE_TAG}"
               DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
               NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --minor --pre-release "-dev.${DEV_N}")
-            elif [[ ${LATEST_RC_TAG} =~ ^${DEVELOPMENT_LINE}\. ]]; then
+            elif [[ ${LATEST_RC_TAG} =~ ^${DEV_LINE}\. ]]; then
               CURRENT_VERSION="${LATEST_RC_TAG}"
               DEV_N=$(git rev-list --count "${LATEST_RC_TAG}..HEAD")
               NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --minor --pre-release "-dev.${DEV_N}")
             fi
           else
-            CURRENT_VERSION="${DEVELOPMENT_LINE}.0.0"
+            CURRENT_VERSION="${LATEST_STABLE_TAG}"
             DEV_N=$(git rev-list --count "${LATEST_STABLE_TAG}..HEAD")
-            NEXT_VERSION=$(bump_version "${CURRENT_VERSION}" --pre-release "-dev.${DEV_N}")
+            NEXT_VERSION=$(bump_version "${DEV_LINE}.0.0" --pre-release "-dev.${DEV_N}")
           fi
 
         elif [[ "${CURRENT_BRANCH}" =~ ^release- ]]; then
