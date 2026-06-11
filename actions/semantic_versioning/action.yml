@@ -238,6 +238,8 @@ runs:
         | is-latest                    | $IS_LATEST                    |
         | release-line                 | $RELEASE_LINE                 |
         | changelog-mode               | $CHANGELOG_MODE               |
+        | dev-source                   | $DEV_SOURCE                   |
+        | filter-version               | $INPUT_FILTER_VERSION         |
         EOF
         )
         echo "$OUTPUTS_SUMMARY"
