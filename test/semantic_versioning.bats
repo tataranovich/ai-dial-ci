@@ -18,10 +18,6 @@ setup() {
 
 # Helper functions
 
-debug() {
-  echo "# DEBUG ${@}" >&3
-}
-
 commit_msg() {
   local msg="${1}"
   COMMIT_COUNTER=$((COMMIT_COUNTER + 1))

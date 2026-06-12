@@ -198,7 +198,6 @@ jobs:
           platforms: ${{ inputs.platforms }}
         env:
           IMAGE_NAME: ${{ github.repository }}
-
       - uses: tataranovich/ai-dial-ci/actions/publish_tag_release@main
         if: ${{ startsWith(github.ref, 'refs/heads/release-') }}
         with:
