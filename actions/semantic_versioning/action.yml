@@ -51,6 +51,7 @@ runs:
       shell: bash
       run: |
         #!/bin/bash
+        set -euo pipefail
         # set -x
 
         function version { echo "$@" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3); }'; }
@@ -87,6 +88,8 @@ runs:
         IS_RELEASE="false"
         IS_LATEST="false"
         CHANGELOG_MODE="tag"
+        RELEASE_LINE=""
+        DEV_SOURCE=""
 
         git fetch --tags
 
@@ -199,7 +202,7 @@ runs:
             LATEST_RC=$(git tag | grep -E "^${RELEASE_LINE}\.0-rc\.[0-9]+$" | sort -V | tail -1 || true)
 
             if [[ -n "${LATEST_RC}" ]]; then
-              RC_N=$(echo "${LATEST_RC}" | sed "s/^.*-rc\.//")
+              RC_N=${LATEST_RC/#*-rc\./}
               CURRENT_VERSION="${LATEST_RC}"
               NEXT_VERSION=$(bump_version "${RELEASE_LINE}.0" --pre-release "-rc.$((RC_N + 1))")
 
@@ -246,15 +249,17 @@ runs:
         echo "$OUTPUTS_SUMMARY" >>"$GITHUB_STEP_SUMMARY"
 
         # Outputs
-        echo "current-version=${CURRENT_VERSION}" >>$GITHUB_OUTPUT
-        echo "next-version=${NEXT_VERSION}" >>$GITHUB_OUTPUT
-        echo "next-version-without-hyphens=${NEXT_VERSION_WITHOUT_HYPHENS}" >>$GITHUB_OUTPUT
-        echo "latest-stable-tag=${LATEST_STABLE_TAG}" >>$GITHUB_OUTPUT
-        echo "is-release-candidate=${IS_RELEASE_CANDIDATE}" >>$GITHUB_OUTPUT
-        echo "is-release=${IS_RELEASE}" >>$GITHUB_OUTPUT
-        echo "is-latest=${IS_LATEST}" >>$GITHUB_OUTPUT
-        echo "release-line=${RELEASE_LINE:-}" >>$GITHUB_OUTPUT
-        echo "changelog-mode=${CHANGELOG_MODE}" >>$GITHUB_OUTPUT
+        cat <<EOF >>"${GITHUB_OUTPUT}"
+        current-version=${CURRENT_VERSION}
+        next-version=${NEXT_VERSION}
+        next-version-without-hyphens=${NEXT_VERSION_WITHOUT_HYPHENS}
+        latest-stable-tag=${LATEST_STABLE_TAG}
+        is-release-candidate=${IS_RELEASE_CANDIDATE}
+        is-release=${IS_RELEASE}
+        is-latest=${IS_LATEST}
+        release-line=${RELEASE_LINE}
+        changelog-mode=${CHANGELOG_MODE}
+        EOF
       env:
         INPUT_FILTER_VERSION: ${{ inputs.filter-version }}
         INPUT_PROMOTE: ${{ inputs.promote }}
