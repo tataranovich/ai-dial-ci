@@ -224,7 +224,7 @@ jobs:
           platforms: ${{ inputs.platforms }}
           dockerfile-path: ${{ inputs.dockerfile-path }}
         env:
--         IMAGE_NAME: ${{ github.repository }}
+          IMAGE_NAME: ${{ github.repository }}
       - name: Publish packages to npmjs
         if: ${{ inputs.publish-enabled }}
         shell: bash
