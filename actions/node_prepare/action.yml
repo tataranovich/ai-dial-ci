@@ -31,4 +31,4 @@ runs:
         npm ci
       env:
         NODE_ENV: "dev"
-        NODE_DEBUG: "*"
+        NODE_DEBUG: "module,child_process,net"
