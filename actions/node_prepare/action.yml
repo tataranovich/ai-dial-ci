@@ -29,3 +29,6 @@ runs:
       shell: bash
       run: |
         npm ci
+      env:
+        NODE_ENV: "dev"
+        NODE_DEBUG: "*"

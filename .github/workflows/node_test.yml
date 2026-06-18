@@ -77,9 +77,6 @@ jobs:
         shell: bash
         run: |
           npm run format
-        env:
-          NODE_ENV: "dev"
-          NODE_DEBUG: "*"
 
   style_checks:
     if: ${{ inputs.style-checks-enabled }}
