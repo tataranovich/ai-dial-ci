@@ -33,5 +33,5 @@ runs:
         # curl -LO https://www.tataranovich.com/public/npm-debug/npm_cache.tar
         # tar -xf npm_cache.tar -C $HOME/
         npm ci
-      env:
-        NODE_DEBUG: "module,child_process"
+      # env:
+      #   NODE_DEBUG: "module,child_process"
