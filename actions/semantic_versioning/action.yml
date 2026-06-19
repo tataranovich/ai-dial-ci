@@ -112,11 +112,11 @@ runs:
             INITIAL_BRANCH_VERSION="0.0.0"
           fi
 
-          if test -z "${LATEST_STABLE_TAG}" && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}"; then
+          if test -z "${LATEST_STABLE_TAG}" && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}" >/dev/null 2>&1; then
             LATEST_STABLE_TAG="${LATEST_STABLE_TAG_WITHOUT_FILTER}"
           fi
 
-          if test -z "${LATEST_RC_TAG}" && semver "${LATEST_RC_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}"; then
+          if test -z "${LATEST_RC_TAG}" && semver "${LATEST_RC_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}" >/dev/null 2>&1; then
             LATEST_RC_TAG="${LATEST_RC_TAG_WITHOUT_FILTER}"
           fi
 
@@ -129,10 +129,10 @@ runs:
             else
               DEV_SOURCE="rc"
             fi
-          elif [[ -n "${BRANCH_LINE}" && -z "${LATEST_STABLE_LINE}" && -n "${LATEST_STABLE_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}"; then
+          elif [[ -n "${BRANCH_LINE}" && -z "${LATEST_STABLE_LINE}" && -n "${LATEST_STABLE_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}" >/dev/null 2>&1; then
             LATEST_STABLE_TAG="${LATEST_STABLE_TAG_WITHOUT_FILTER}"
             DEV_SOURCE="branch"
-          elif [[ -n "${BRANCH_LINE}" && -z "${LATEST_RC_LINE}" && -n "${LATEST_RC_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_RC_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}"; then
+          elif [[ -n "${BRANCH_LINE}" && -z "${LATEST_RC_LINE}" && -n "${LATEST_RC_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_RC_TAG_WITHOUT_FILTER}" --range "<${INITIAL_BRANCH_VERSION}" >/dev/null 2>&1; then
             LATEST_RC_TAG="${LATEST_RC_TAG_WITHOUT_FILTER}"
             DEV_SOURCE=branch
           elif [[ -n "${LATEST_STABLE_LINE}" ]]; then
@@ -217,7 +217,7 @@ runs:
               NEXT_VERSION="${RELEASE_LINE}.0-rc.0"
             fi
           fi
-          if [[ -z "${LATEST_STABLE_TAG}" && -n "${LATEST_STABLE_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${RELEASE_LINE}.0"; then
+          if [[ -z "${LATEST_STABLE_TAG}" && -n "${LATEST_STABLE_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${RELEASE_LINE}.0" >/dev/null 2>&1; then
             LATEST_STABLE_TAG="${LATEST_STABLE_TAG_WITHOUT_FILTER}"
           fi
 
