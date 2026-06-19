@@ -651,8 +651,8 @@ assert_calc() {
   git tag 1.1.0
 }
 
-@test "Default and strict version filter" {
-  init_dummy_repo "${BATS_TEST_TMPDIR}/default-and-strict-version-filter"
+@test "Default version filter" {
+  init_dummy_repo "${BATS_TEST_TMPDIR}/default-version-filter"
 
   commit_msg "chore: initial commit"
   assert_calc "S0" "development" "[0-9]+\.[0-9]+" "false" "^development$" "^release-[0-9]+\.[0-9]+$" "0.1.0-dev.1" "false" "false" "false" "" "tag"
@@ -675,13 +675,51 @@ assert_calc() {
 
   git checkout -q -b development-1.x
   commit_msg "feat: 3"
-  assert_calc "S5" "development-1.x" "[0-9]+\.[0-9]+" "false" "^development-1\.x$" "^release-1\.[0-9]+$" "1.0.0-dev.2" "false" "false" "false" "" "tag"
+  assert_calc "S5" "development-1.x" "[0-9]+\.[0-9]+" "false" "^development-1\.x$" "^release-[0-9]+\.[0-9]+$" "1.0.0-dev.2" "false" "false" "false" "" "tag"
+
+  commit_msg "feat: 4"
+  assert_calc "S6" "development-1.x" "[0-9]+\.[0-9]+" "false" "^development-1\.x$" "^release-[0-9]+\.[0-9]+$" "1.0.0-dev.3" "false" "false" "false" "" "tag"
+
+  git checkout -q -b release-1.0
+  assert_calc "S7" "release-1.0" "[0-9]+\.[0-9]+" "false" "^development-1\.x$" "^release-[0-9]+\.[0-9]+$" "1.0.0-rc.0" "true" "false" "false" "1.0" "tag"
+  git tag 1.0.0-rc.0
+
+  assert_calc "S8" "release-1.0" "[0-9]+\.[0-9]+" "true" "^development-1\.x$" "^release-[0-9]+\.[0-9]+$" "1.0.0" "false" "true" "true" "1.0" "merge-base"
+  commit_msg "[skip ci] Update version"
+  git tag 1.0.0
+}
+
+@test "Strict version filter" {
+  init_dummy_repo "${BATS_TEST_TMPDIR}/strict-version-filter"
+
+  commit_msg "chore: initial commit"
+  assert_calc "S0" "development" "[0-9]+\.[0-9]+" "false" "^development$" "^release-[0-9]+\.[0-9]+$" "0.1.0-dev.1" "false" "false" "false" "" "tag"
+
+  commit_msg "feat: 1"
+  assert_calc "S1" "development" "[0-9]+\.[0-9]+" "false" "^development$" "^release-[0-9]+\.[0-9]+$" "0.1.0-dev.2" "false" "false" "false" "" "tag"
+
+  git checkout -q -b release-0.1
+  assert_calc "S2" "release-0.1" "[0-9]+\.[0-9]+" "false" "^development$" "^release-[0-9]+\.[0-9]+$" "0.1.0-rc.0" "true" "false" "false" "0.1" "tag"
+  commit_msg "[skip ci] Update version"
+  git tag 0.1.0-rc.0
+
+  assert_calc "S3" "release-0.1" "[0-9]+\.[0-9]+" "true" "^development$" "^release-[0-9]+\.[0-9]+$" "0.1.0" "false" "true" "true" "0.1" "merge-base"
+  commit_msg "[skip ci] Update version"
+  git tag 0.1.0
+
+  git checkout -q development
+  commit_msg "ci: filter 0.x versions"
+  assert_calc "S4" "development" "0\.[0-9]+" "false" "^development$" "^release-0\.[0-9]+$" "0.2.0-dev.1" "false" "false" "false" "" "tag"
+
+  git checkout -q -b development-1.x
+  commit_msg "feat: 3"
+  assert_calc "S5" "development-1.x" "1\.[0-9]+" "false" "^development-1\.x$" "^release-1\.[0-9]+$" "1.0.0-dev.2" "false" "false" "false" "" "tag"
 
   commit_msg "feat: 4"
   assert_calc "S6" "development-1.x" "1\.[0-9]+" "false" "^development-1\.x$" "^release-1\.[0-9]+$" "1.0.0-dev.3" "false" "false" "false" "" "tag"
 
   git checkout -q -b release-1.0
-  assert_calc "S7" "release-1.0" "[0-9]+\.[0-9]+" "false" "^development-1\.x$" "^release-1\.[0-9]+$" "1.0.0-rc.0" "true" "false" "false" "1.0" "tag"
+  assert_calc "S7" "release-1.0" "1\.[0-9]+" "false" "^development-1\.x$" "^release-1\.[0-9]+$" "1.0.0-rc.0" "true" "false" "false" "1.0" "tag"
   git tag 1.0.0-rc.0
 
   assert_calc "S8" "release-1.0" "1\.[0-9]+" "true" "^development-1\.x$" "^release-1\.[0-9]+$" "1.0.0" "false" "true" "true" "1.0" "merge-base"
