@@ -216,9 +216,9 @@ runs:
               CURRENT_VERSION=""
               NEXT_VERSION="${RELEASE_LINE}.0-rc.0"
             fi
-            if [[ -z "${LATEST_STABLE_TAG}" && -n "${LATEST_STABLE_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${RELEASE_LINE}.0.0"; then
-              LATEST_STABLE_TAG="${LATEST_STABLE_TAG_WITHOUT_FILTER}"
-            fi
+          fi
+          if [[ -z "${LATEST_STABLE_TAG}" && -n "${LATEST_STABLE_TAG_WITHOUT_FILTER}" ]] && semver "${LATEST_STABLE_TAG_WITHOUT_FILTER}" --range "<${RELEASE_LINE}.0.0"; then
+            LATEST_STABLE_TAG="${LATEST_STABLE_TAG_WITHOUT_FILTER}"
           fi
 
         else
