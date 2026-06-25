@@ -28,10 +28,4 @@ runs:
       if: ${{ fromJSON(inputs.clean-install) }} # workaround for composite jobs not being able to pass boolean inputs
       shell: bash
       run: |
-        # sudo apt-get update
-        # sudo apt-get install -y libvips42t64
-        # curl -LO https://www.tataranovich.com/public/npm-debug/npm_cache.tar
-        # tar -xf npm_cache.tar -C $HOME/
         npm ci
-      # env:
-      #   NODE_DEBUG: "module,child_process"
