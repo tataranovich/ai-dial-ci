@@ -105,8 +105,9 @@ jobs:
       - uses: tataranovich/ai-dial-ci/actions/python_prepare@main
         with:
           python-version: ${{ inputs.python-version }}
-          python-package-manager: ${{ inputs.python-package-manager }}
+          install-poetry: ${{ inputs.python-package-manager == 'poetry' }}
           poetry-version: ${{ inputs.poetry-version }}
+          install-uv: ${{ inputs.python-package-manager == 'uv' }}
           uv-version: ${{ inputs.uv-version }}
       - name: Test
         continue-on-error: ${{ inputs.bypass-checks || inputs.style-checks-bypassed }}
