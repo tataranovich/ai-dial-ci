@@ -172,9 +172,9 @@ jobs:
       - uses: tataranovich/ai-dial-ci/actions/python_prepare@main
         with:
           python-version: ${{ inputs.python-version }}
-          install-poetry: ${{ inputs.python-package-manager == 'poetry' }}
+          poetry-install: ${{ inputs.python-package-manager == 'poetry' }}
           poetry-version: ${{ inputs.poetry-version }}
-          install-uv: ${{ inputs.python-package-manager == 'uv' }}
+          uv-install: ${{ inputs.python-package-manager == 'uv' }}
           uv-version: ${{ inputs.uv-version }}
       - name: Set version
         shell: bash
