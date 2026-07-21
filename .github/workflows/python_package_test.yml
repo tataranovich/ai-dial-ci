@@ -83,9 +83,17 @@ on:
         type: string
         description: Python version to use
         default: "3.11"
+      python-package-manager:
+        type: string
+        description: Python package manager to use
+        default: "poetry"
       poetry-version:
         type: string
         description: Poetry version to use
+        default: "latest"
+      uv-version:
+        type: string
+        description: UV version to use
         default: "latest"
       runs-on:
         type: string
@@ -103,7 +111,10 @@ jobs:
       - uses: tataranovich/ai-dial-ci/actions/python_prepare@main
         with:
           python-version: ${{ inputs.python-version }}
+          install-poetry: ${{ inputs.python-package-manager == 'poetry' }}
           poetry-version: ${{ inputs.poetry-version }}
+          install-uv: ${{ inputs.python-package-manager == 'uv' }}
+          uv-version: ${{ inputs.uv-version }}
       - name: Test
         continue-on-error: ${{ inputs.bypass-checks || inputs.style-checks-bypassed }}
         shell: bash
@@ -124,7 +135,10 @@ jobs:
       - uses: tataranovich/ai-dial-ci/actions/python_prepare@main
         with:
           python-version: ${{ matrix.python-version }}
+          install-poetry: ${{ inputs.python-package-manager == 'poetry' }}
           poetry-version: ${{ inputs.poetry-version }}
+          install-uv: ${{ inputs.python-package-manager == 'uv' }}
+          uv-version: ${{ inputs.uv-version }}
       - name: Test
         continue-on-error: ${{ inputs.bypass-checks || inputs.code-checks-bypassed }}
         shell: bash
