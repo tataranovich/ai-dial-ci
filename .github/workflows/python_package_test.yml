@@ -166,7 +166,7 @@ jobs:
           image: "ghcr.io/oss-review-toolkit/ort:${{ inputs.ort-version }}"
           allow-dynamic-versions: "true"
           fail-on: "violations"
-          ort-cli-args: "-P ort.forceOverwrite=true --stacktrace -P ort.analyzer.enabledPackageManagers=Poetry"
+          ort-cli-args: "-P ort.forceOverwrite=true --stacktrace -P ort.analyzer.enabledPackageManagers=Poetry" # ORT analyzer doesn't support UV
           ort-config-repository: ${{ inputs.ort-config-repository }}
           ort-config-revision: ${{ inputs.ort-config-revision }}
         continue-on-error: ${{ fromJSON(env.CONTINUE_ON_ERROR) }}
