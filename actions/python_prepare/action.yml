@@ -75,6 +75,7 @@ runs:
       with:
         version: ${{ inputs.uv-version }}
         python-version: ${{ inputs.python-version }}
+        activate-environment: true
     - name: Load cached Poetry venv
       id: cached-poetry-dependencies
       if: ${{ fromJSON(inputs.poetry-install) && fromJSON(inputs.cache) }}
