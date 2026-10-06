@@ -231,8 +231,8 @@ jobs:
     with:
       ghcr-username: ${{ github.actor }}
       ghcr-password: ${{ secrets.ACTIONS_BOT_TOKEN }}
-      dockerhub-username: ${{ secrets.DOCKERHUB_LOGIN }}
-      dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # dockerhub-username: ${{ secrets.DOCKERHUB_LOGIN }}
+      # dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
       image-names: |
         ghcr.io/${{ github.repository }}
       image-tags: |
