@@ -51,30 +51,6 @@ on:
           Docker image tags (or tag rules) for docker/metadata-action tags input
           ref: https://github.com/docker/metadata-action#tags-input
         required: true
-      ghcr-username:
-        type: string
-        description: GitHub Container Registry username. This is required for pushing to GitHub Container Registry
-        default: ${{ github.actor }}
-      ghcr-password:
-        type: string
-        description: GitHub Container Registry password/token. This is required for pushing to GitHub Container Registry
-        default: ""
-      dockerhub-username:
-        type: string
-        description: Docker Hub username. This is required for pushing to Docker Hub
-        default: ""
-      dockerhub-password:
-        type: string
-        description: Docker Hub password/token. This is required for pushing to Docker Hub
-        default: ""
-      gpr-username:
-        type: string
-        description: GitHub Package Registry username (for pulling packages from image being built)
-        default: ${{ github.actor }}
-      gpr-password:
-        type: string
-        description: GitHub Package Registry password/token (for pulling packages from image being built)
-        default: ""
       platforms:
         type: string
         description: Docker build platforms

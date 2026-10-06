@@ -229,10 +229,6 @@ jobs:
       - calculate_version
       - release-pre
     with:
-      ghcr-username: ${{ github.actor }}
-      ghcr-password: ${{ secrets.ACTIONS_BOT_TOKEN }}
-      # dockerhub-username: ${{ secrets.DOCKERHUB_LOGIN }}
-      # dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
       image-names: |
         ghcr.io/${{ github.repository }}
       image-tags: |
@@ -247,6 +243,7 @@ jobs:
       platforms: ${{ inputs.platforms }}
       dockerfile-path: ${{ inputs.dockerfile-path }}
       build-args: ${{ inputs.build-args }}
+    secrets: inherit
 
   release-post:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
