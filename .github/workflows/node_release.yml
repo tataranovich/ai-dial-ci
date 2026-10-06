@@ -224,7 +224,7 @@ jobs:
           npm version ${{ needs.calculate_version.outputs.next-version }} --no-git-tag-version --allow-same-version
 
   release:
-    uses: tataranovich/ai-dial-ci/.github/workflows/docker_build.yml@main
+    uses: ./.github/workflows/docker_build.yml
     needs:
       - calculate_version
       - release-pre
