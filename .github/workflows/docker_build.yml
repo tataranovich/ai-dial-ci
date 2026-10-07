@@ -67,6 +67,18 @@ on:
         default: ""
 
 jobs:
+  # Converts the comma-separated platforms input into a JSON array so it can
+  # be used as a matrix value (GitHub Actions expressions have no split()).
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      platforms: ${{ steps.platforms.outputs.json }}
+    steps:
+      - name: Convert platforms to JSON array
+        id: platforms
+        run: |
+          echo "json=$(echo '${{ inputs.platforms }}' | tr -d ' ' | jq -R -c 'split(",")')" >> "$GITHUB_OUTPUT"
+
   # Builds and pushes the image under a throwaway scan-only tag so Trivy can
   # scan the exact artifact that will be released, without exposing it under
   # its real tags until the scan passes.
@@ -92,11 +104,11 @@ jobs:
 
   scan:
     if: ${{ inputs.trivy-enabled }}
-    needs: build
+    needs: [prepare, build]
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ inputs.platforms }}
+        platform: ${{ fromJSON(needs.prepare.outputs.platforms) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
