@@ -231,6 +231,7 @@ jobs:
     with:
       image-names: |
         ghcr.io/${{ github.repository }}
+        ${{ github.repository }}
       image-tags: |
         type=raw,value=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.next-version || inputs.docker-development-tag }}
         type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is-latest == 'true' }}

@@ -145,11 +145,19 @@ jobs:
       packages: write
     steps:
       - name: Log in to GHCR
+        if: ${{ inputs.push-enabled }}
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.ACTIONS_BOT_TOKEN }}
+
+      - name: Login to Docker Hub
+        if: ${{ inputs.push-enabled }}
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          username: ${{ secrets.GITHUB_USERNAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker metadata
         id: meta
