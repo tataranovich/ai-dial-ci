@@ -170,11 +170,14 @@ jobs:
 
       - name: Promote scanned image to release tags
         env:
-          AUTH_TOKEN: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          GHCR_TOKEN: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          set -euo pipefail
-          echo "${AUTH_TOKEN}" | crane auth login ghcr.io --username ${{ github.actor }} --password-stdin
+          set -euxo pipefail
+          echo "${GHCR_TOKEN}" | crane auth login ghcr.io --username ${{ github.actor }} --password-stdin
+          echo "${DOCKERHUB_TOKEN}" | crane auth login docker.io --username ${{ github.actor }} --password-stdin
           while IFS= read -r IMAGE_NAME; do
+            [ -z "${IMAGE_NAME}" ] && continue
             while IFS= read -r IMAGE_TAG; do
               [ -z "${IMAGE_TAG}" ] && continue
               crane tag "ghcr.io/${{ github.repository }}:scan-${{ github.sha }}" "${IMAGE_NAME}:${IMAGE_TAG}"
