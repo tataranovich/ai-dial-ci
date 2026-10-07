@@ -128,7 +128,7 @@ jobs:
           TRIVY_PLATFORM: ${{ matrix.platform }}
         with:
           scan-type: image
-          image-ref: ${{ github.repository }}:scan-${{ github.sha }}
+          image-ref: ghcr.io/${{ github.repository }}:scan-${{ github.sha }}
           trivy-config: trivy.yaml
           severity: ${{ inputs.trivy-severity }}
           ignore-unfixed: true
