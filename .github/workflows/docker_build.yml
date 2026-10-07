@@ -180,6 +180,9 @@ jobs:
             [ -z "${IMAGE_NAME}" ] && continue
             while IFS= read -r IMAGE_TAG; do
               [ -z "${IMAGE_TAG}" ] && continue
+              if echo "${IMAGE_TAG}" | grep -q type=raw; then
+                IMAGE_TAG=$(echo "${IMAGE_TAG}" | | tr ',' '\n' | grep value= | cut -d= -f2)
+              fi
               crane tag "ghcr.io/${{ github.repository }}:scan-${{ github.sha }}" "${IMAGE_NAME}:${IMAGE_TAG}"
             done <<< "${{ inputs.image-tags }}"
           done <<< "${{ inputs.image-names }}"
