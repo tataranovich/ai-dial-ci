@@ -113,7 +113,7 @@ jobs:
   # scan the exact artifact that will be released, without exposing it under
   # its real tags until the scan passes.
   build:
-    uses: docker/github-builder/.github/workflows/build.yml@ef01f666f99b7303a61188cc6c170840796e743d # secrets.build-secrets is not available under any tag yet
+    uses: docker/github-builder/.github/workflows/build.yml@d42d7c722c8446192091bb03aa9c6c721ac82251 # secrets.build-secrets is not available under any tag yet
     permissions:
       contents: read # to fetch the repository content
       id-token: write # for signing attestations and cache entries with GitHub OIDC
