@@ -113,7 +113,7 @@ jobs:
   # scan the exact artifact that will be released, without exposing it under
   # its real tags until the scan passes.
   build:
-    uses: docker/github-builder/.github/workflows/build.yml@d42d7c722c8446192091bb03aa9c6c721ac82251 # secrets.build-secrets is not available under any tag yet
+    uses: docker/github-builder/.github/workflows/build.yml@v1 # secrets.build-secrets is not available under any tag yet
     permissions:
       contents: read # to fetch the repository content
       id-token: write # for signing attestations and cache entries with GitHub OIDC
@@ -131,9 +131,9 @@ jobs:
         - registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.ACTIONS_BOT_TOKEN }}
-      build-secrets: |
-        GPR_USERNAME: ${{ toJson(github.actor) }}
-        GPR_PASSWORD: ${{ toJson(secrets.GITHUB_TOKEN) }}
+      # build-secrets: |
+      #   GPR_USERNAME: ${{ toJson(github.actor) }}
+      #   GPR_PASSWORD: ${{ toJson(secrets.GITHUB_TOKEN) }}
 
   scan:
     if: ${{ inputs.trivy-enabled }}
