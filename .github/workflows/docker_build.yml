@@ -112,6 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
@@ -122,17 +123,58 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.ACTIONS_BOT_TOKEN }}
 
-      - name: Scan built image with Trivy (${{ matrix.platform }})
+      - name: Run Trivy scanner (JSON output, no fail) (${{ matrix.platform }})
+        id: trivy
         uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         env:
           TRIVY_PLATFORM: ${{ matrix.platform }}
+          CONTINUE_ON_ERROR: ${{ inputs.bypass-checks }} # Hack to use the input below as a boolean
+          TRIVY_DISABLE_VEX_NOTICE: true
         with:
           scan-type: image
           image-ref: ghcr.io/${{ github.repository }}:scan-${{ github.sha }}
-          trivy-config: trivy.yaml
+          format: "json"
+          exit-code: "0" # Do not fail on findings here, should be handled in the latest "trivy convert" step
+          output: "trivy-results.json"
           severity: ${{ inputs.trivy-severity }}
-          ignore-unfixed: true
-          exit-code: "1"
+          ignore-unfixed: ${{ inputs.trivy-ignore-unfixed }}
+          vuln-type: ${{ inputs.trivy-vuln-type }}
+          scanners: ${{ inputs.trivy-scanners }}
+        continue-on-error: ${{ fromJSON(env.CONTINUE_ON_ERROR) }}
+      - name: Generate Trivy report (SARIF) (${{ matrix.platform }})
+        id: trivy-generate-sarif
+        # Do not generate SARIF reports on private repos - GitHub Advanced Security is not enabled
+        # Do not generate SARIF reports for pull requests from forks
+        if: ${{ steps.trivy.outcome == 'success' && !github.event.repository.private && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name) }}
+        run: |
+          trivy convert --format sarif --output trivy-results.sarif --exit-code 0 trivy-results.json
+        shell: bash
+        env:
+          CONTINUE_ON_ERROR: ${{ inputs.bypass-checks }} # Hack to use the input below as a boolean
+          TRIVY_SCANNERS: ${{ inputs.trivy-scanners }}
+          TRIVY_SEVERITY: ${{ fromJson(inputs.trivy-limit-severities-for-sarif) && inputs.trivy-severity-for-sarif || '' }}
+          TRIVY_DISABLE_VEX_NOTICE: true
+        continue-on-error: ${{ fromJSON(env.CONTINUE_ON_ERROR) }}
+      - name: Upload Trivy report (SARIF) (${{ matrix.platform }})
+        if: ${{ steps.trivy-generate-sarif.outcome == 'success' }}
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          sarif_file: "trivy-results.sarif"
+          category: trivy-${{ matrix.platform }}
+        env:
+          CONTINUE_ON_ERROR: ${{ inputs.bypass-checks }} # Hack to use the input below as a boolean
+        continue-on-error: ${{ fromJSON(env.CONTINUE_ON_ERROR) }}
+      - name: Generate Trivy report (Table, must fail on findings) (${{ matrix.platform }})
+        if: ${{ steps.trivy.outcome == 'success' }}
+        run: |
+          trivy convert --format table --exit-code 1 trivy-results.json
+        shell: bash
+        env:
+          CONTINUE_ON_ERROR: ${{ inputs.bypass-checks }} # Hack to use the input below as a boolean
+          TRIVY_SCANNERS: ${{ inputs.trivy-scanners }}
+          TRIVY_SEVERITY: ${{ inputs.trivy-severity }}
+          TRIVY_DISABLE_VEX_NOTICE: true
+        continue-on-error: ${{ fromJSON(env.CONTINUE_ON_ERROR) }}
 
   # Promotes the already-scanned image to its real tags by copying the
   # manifest (no rebuild, no re-push of layers) once the scan has passed.
