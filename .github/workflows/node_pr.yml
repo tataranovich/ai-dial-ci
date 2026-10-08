@@ -156,9 +156,9 @@ jobs:
           lfs: true
       # HACK: jobs.<job_id>.if does not support hashFiles function, so we have to copy it to the each step
       - if: ${{ (hashFiles(inputs.dockerfile-path) != '') }}
-        uses: tataranovich/ai-dial-ci/actions/build_docker@main
+        uses: ./.github/workflows/docker_build.yml
         with:
-          image-names: ghcr.io/${{ env.IMAGE_NAME }}
+          image-names: ghcr.io/${{ github.repository }}
           image-tags: test
           trivy-enabled: ${{ inputs.trivy-enabled }}
           bypass-checks: ${{ inputs.trivy-bypassed }}
@@ -168,5 +168,5 @@ jobs:
           platforms: ${{ inputs.platforms }}
           dockerfile-path: ${{ inputs.dockerfile-path }}
           build-args: ${{ inputs.build-args }}
-        env:
-          IMAGE_NAME: ${{ github.repository }}
+          maximize-build-space: ${{ inputs.maximize-build-space }}
+        secrets: inherit
