@@ -101,6 +101,9 @@ jobs:
         - registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.ACTIONS_BOT_TOKEN }}
+      build-secrets: |
+        GPR_USERNAME=${{ github.actor }}
+        GPR_PASSWORD=${{ github.token }}
 
   scan:
     if: ${{ inputs.trivy-enabled }}
