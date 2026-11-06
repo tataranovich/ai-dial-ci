@@ -5,7 +5,7 @@ on:
     inputs:
       images:
         type: string
-        description: Image names without registry, one per line (e.g. epam/ai-dial-chat). Empty means source scan only
+        description: Image names without registry, one per line (e.g. tataranovich/ai-dial-chat). Empty means source scan only
         default: ""
       registry:
         type: string
