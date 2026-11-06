@@ -167,8 +167,7 @@ jobs:
           filter-version: ${{ inputs.filter-version }}
           primary-branch-pattern: ${{ inputs.primary-branch-pattern }}
           release-branch-pattern: ${{ inputs.release-branch-pattern }}
-
-  release-pre:
+  release:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
     permissions:
       contents: write
@@ -179,6 +178,32 @@ jobs:
       - calculate_version
       - test
     steps:
+      - name: Maximize build space
+        uses: nepalevov/maximize-build-space@046c48361370e2f3fa758bd2f10c6ce29109ef62 # v1.1.0
+        if: ${{ inputs.maximize-build-space }}
+        with:
+          remove-dotnet: "true"
+          remove-android: "true"
+          remove-haskell: "true"
+          remove-codeql: "true"
+          remove-large-packages: "true"
+          remove-cached-tools: "true"
+          remove-swapfile: "true"
+          remove-java: "true"
+          remove-swift: "true"
+          remove-julia: "true"
+          remove-browsers: "true"
+          remove-cloud-tools: "true"
+          remove-kubernetes-tools: "true"
+          remove-powershell: "true"
+          remove-container-tools: "true"
+          remove-rust: "true"
+          remove-python: "true"
+          remove-node: "true"
+          remove-go: "true"
+          remove-ruby: "true"
+          docker-cleanup: "true"
+          set-tmpdir: "true"
       - uses: tataranovich/ai-dial-ci/actions/generate_release_notes@main
         with:
           latest-tag: ${{ needs.calculate_version.outputs.latest-stable-tag }}
@@ -196,43 +221,31 @@ jobs:
         shell: bash
         run: |
           npm version ${{ needs.calculate_version.outputs.next-version }} --no-git-tag-version --allow-same-version
-
-  release:
-    uses: ./.github/workflows/docker_build.yml
-    needs:
-      - calculate_version
-      - release-pre
-    with:
-      image-names: |
-        ghcr.io/${{ github.repository }}
-        ${{ github.repository }}
-      image-tags: |
-        type=raw,value=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.next-version || inputs.docker-development-tag }}
-        type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is-latest == 'true' }}
-      push-enabled: true
-      trivy-enabled: ${{ inputs.trivy-enabled }}
-      bypass-checks: ${{ inputs.trivy-bypassed }}
-      trivy-severity: ${{ inputs.trivy-severity }}
-      trivy-severity-for-sarif: ${{ inputs.trivy-severity-for-sarif }}
-      trivy-limit-severities-for-sarif: ${{ inputs.trivy-limit-severities-for-sarif }}
-      platforms: ${{ inputs.platforms }}
-      dockerfile-path: ${{ inputs.dockerfile-path }}
-      build-args: ${{ inputs.build-args }}
-      maximize-build-space: ${{ inputs.maximize-build-space }}
-    secrets: inherit
-
-  release-post:
-    runs-on: ${{ fromJSON(inputs.runs-on) }}
-    permissions:
-      contents: write
-      id-token: write # for trusted publishing to npmjs registry
-      packages: write # for publishing to GitHub Packages registry
-      security-events: write # for uploading Trivy SARIF report to GitHub
-    needs:
-      - calculate_version
-      - test
-      - release
-    steps:
+      # HACK: jobs.<job_id>.if does not support hashFiles function, so we have to copy it to the each step
+      - if: ${{ inputs.docker-build-enabled && (hashFiles(inputs.dockerfile-path) != '') }}
+        uses: tataranovich/ai-dial-ci/actions/build_docker@main
+        with:
+          ghcr-username: ${{ github.actor }}
+          ghcr-password: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          dockerhub-username: ${{ secrets.DOCKERHUB_LOGIN }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+          image-names: |
+            ${{ env.IMAGE_NAME }}
+            ghcr.io/${{ env.IMAGE_NAME }}
+          image-tags: |
+            type=raw,value=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.next-version || inputs.docker-development-tag }}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is-latest == 'true' }}
+          push-enabled: true
+          trivy-enabled: ${{ inputs.trivy-enabled }}
+          bypass-checks: ${{ inputs.trivy-bypassed }}
+          trivy-severity: ${{ inputs.trivy-severity }}
+          trivy-severity-for-sarif: ${{ inputs.trivy-severity-for-sarif }}
+          trivy-limit-severities-for-sarif: ${{ inputs.trivy-limit-severities-for-sarif }}
+          platforms: ${{ inputs.platforms }}
+          dockerfile-path: ${{ inputs.dockerfile-path }}
+          build-args: ${{ inputs.build-args }}
+        env:
+          IMAGE_NAME: ${{ github.repository }}
       - name: Publish packages to npmjs
         if: ${{ inputs.publish-enabled }}
         shell: bash

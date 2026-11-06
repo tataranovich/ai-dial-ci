@@ -66,6 +66,12 @@ jobs:
     outputs:
       test-applications: ${{ steps.test-applications.outputs.json }}
     steps:
+      - run: |
+          if [[ -n "$DISPATCH_COMMENT_URL" ]]; then
+            echo "Triggered by ${DISPATCH_COMMENT_URL}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          DISPATCH_COMMENT_URL: ${{ github.event.client_payload.github.payload.comment.html_url }}
       - name: Check dispatch repository ownership
         id: owner
         run: |
@@ -156,7 +162,7 @@ jobs:
         id: test-applications
         run: |
           INPUT="${{ github.event.client_payload.slash_command.args.named.test-applications || 'chat' }}"
-          DEFAULT_REPO="tataranovich/ai-dial-chat"
+          DEFAULT_REPO="epam/ai-dial-chat"
           # Parse comma-separated items, each can be "application" or "application:repo"
           # Output: [{"application": "...", "test-repository": "..."}]
           JSON=$(echo "$INPUT" | jq -Rc --arg default "$DEFAULT_REPO" '
