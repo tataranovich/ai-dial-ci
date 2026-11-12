@@ -246,8 +246,6 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: scan/${{ matrix.pair }}:${{ github.sha }}
           build-args: ${{ inputs.build-args }}
-          cache-from: type=gha,scope=${{ matrix.pair }}
-          cache-to: type=gha,scope=${{ matrix.pair }},mode=max
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
 
@@ -294,7 +292,7 @@ jobs:
           TRIVY_DISABLE_VEX_NOTICE: true
         continue-on-error: ${{ inputs.trivy-bypassed || inputs.bypass-checks }}
 
-      # --- Push by digest (reached only when the Trivy steps above passed). Layers come from the cache.
+      # --- Push by digest (reached only when the Trivy steps above passed). Layers are reused from the builder's local cache.
       - name: Build and push by digest
         id: push
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
@@ -303,7 +301,6 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: ${{ inputs.build-args }}
-          cache-from: type=gha,scope=${{ matrix.pair }}
           outputs: type=image,"name=${{ env.IMAGE_NAME }},ghcr.io/${{ env.IMAGE_NAME }}",push-by-digest=true,name-canonical=true,push=true
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false

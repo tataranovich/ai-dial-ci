@@ -230,8 +230,6 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: scan/${{ matrix.pair }}:${{ github.sha }}
           build-args: ${{ inputs.build-args }}
-          cache-from: type=gha,scope=pr-${{ matrix.pair }}
-          cache-to: type=gha,scope=pr-${{ matrix.pair }},mode=max
           secrets: |
             GPR_USERNAME=${{ github.actor }}
             GPR_PASSWORD=${{ secrets.ACTIONS_BOT_TOKEN }}
