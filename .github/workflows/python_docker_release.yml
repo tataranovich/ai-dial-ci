@@ -215,7 +215,7 @@ jobs:
       security-events: write # upload Trivy SARIF
     steps:
       - name: Maximize build space
-        uses: nepalevov/maximize-build-space@046c48361370e2f3fa758bd2f10c6ce29109ef62 # v1.1.0
+        uses: tataranovich/maximize-build-space@88fe986ea118c901ed75e619328df034ac75611d
         if: ${{ inputs.maximize-build-space }}
         with:
           remove-dotnet: "true"
@@ -436,7 +436,7 @@ jobs:
       - docker_merge
     steps:
       - name: Maximize build space
-        uses: nepalevov/maximize-build-space@046c48361370e2f3fa758bd2f10c6ce29109ef62 # v1.1.0
+        uses: tataranovich/maximize-build-space@88fe986ea118c901ed75e619328df034ac75611d
         if: ${{ inputs.maximize-build-space }}
         with:
           remove-dotnet: "true"
