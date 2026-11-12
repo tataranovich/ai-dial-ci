@@ -461,6 +461,7 @@ jobs:
           remove-ruby: "true"
           docker-cleanup: "true"
           set-tmpdir: "true"
+          verbose: "true"
       - uses: tataranovich/ai-dial-ci/actions/generate_release_notes@main
         with:
           latest-tag: ${{ needs.calculate_version.outputs.latest-stable-tag }}
