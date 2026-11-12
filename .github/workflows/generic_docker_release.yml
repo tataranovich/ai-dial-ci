@@ -196,7 +196,7 @@ jobs:
           remove-java: "true"
           remove-swift: "true"
           remove-julia: "true"
-          remove-browsers: "true"
+          remove-browsers: ${{ matrix.platform == 'linux/arm64' && 'false' || 'true' }}
           remove-cloud-tools: "true"
           remove-kubernetes-tools: "true"
           remove-powershell: "true"
