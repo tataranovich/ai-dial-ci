@@ -362,64 +362,16 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Download digests
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: tataranovich/ai-dial-ci/actions/docker_merge@main
         with:
-          path: ${{ runner.temp }}/digests
-          pattern: digests-*
-          merge-multiple: true
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
-        with:
-          images: |
-            ${{ env.IMAGE_NAME }}
-            ghcr.io/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
+          image-name: ${{ env.IMAGE_NAME }}
+          image-tags: |
             type=raw,value=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.next-version || inputs.docker-development-tag }}
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/heads/release-') && needs.calculate_version.outputs.is-latest == 'true' }}
-        env:
-          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.ACTIONS_BOT_TOKEN }}
-      - name: Login to Docker Hub
-        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          username: ${{ secrets.DOCKERHUB_LOGIN }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Create multi-platform images and push
-        working-directory: ${{ runner.temp }}/digests
-        shell: bash
-        run: |
-          set -euo pipefail
-          annotations=()
-          while IFS= read -r a; do
-            [ -n "$a" ] && annotations+=(--annotation "$a")
-          done < <(jq -r '.annotations // [] | .[]' <<< "$DOCKER_METADATA_OUTPUT_JSON")
-
-          for image in "${IMAGE_NAME}" "ghcr.io/${IMAGE_NAME}"; do
-            tags=()
-            while IFS= read -r t; do tags+=(-t "$t"); done \
-              < <(jq -r --arg img "$image:" '.tags[] | select(startswith($img))' <<< "$DOCKER_METADATA_OUTPUT_JSON")
-            sources=()
-            for d in *; do sources+=("${image}@sha256:${d}"); done
-            docker buildx imagetools create "${annotations[@]}" "${tags[@]}" "${sources[@]}"
-          done
-      - name: Inspect images
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r t; do
-            docker buildx imagetools inspect "$t"
-          done < <(jq -r '.tags[]' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          ghcr-username: ${{ github.actor }}
+          ghcr-password: ${{ secrets.ACTIONS_BOT_TOKEN }}
+          dockerhub-username: ${{ secrets.DOCKERHUB_LOGIN }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
 
   # npm publish and git tag / GitHub release. Runs after the Docker image is published
   # (or when the Docker build is disabled / skipped).
