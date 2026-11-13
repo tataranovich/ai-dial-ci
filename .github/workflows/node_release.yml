@@ -171,35 +171,22 @@ jobs:
           primary-branch-pattern: ${{ inputs.primary-branch-pattern }}
           release-branch-pattern: ${{ inputs.release-branch-pattern }}
 
-  # Decides whether the Docker build runs and builds the per-platform matrix.
+  # Builds the per-platform matrix for the Docker build.
   docker_plan:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
+    if: ${{ inputs.docker-build-enabled }}
     outputs:
-      enabled: ${{ steps.plan.outputs.enabled }}
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
-      # HACK: jobs.<job_id>.if does not support hashFiles function, so the Dockerfile is checked here
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: ${{ inputs.docker-build-enabled }}
-        with:
-          sparse-checkout: ${{ inputs.dockerfile-path }}
-          sparse-checkout-cone-mode: false
       - name: Plan Docker build
         id: plan
         shell: bash
         env:
-          DOCKER_BUILD_ENABLED: ${{ inputs.docker-build-enabled }}
-          DOCKERFILE_PATH: ${{ inputs.dockerfile-path }}
           PLATFORMS: ${{ inputs.platforms }}
           RUNS_ON: ${{ inputs.runs-on }}
           REPO_PRIVATE: ${{ github.event.repository.private }}
         run: |
           set -euo pipefail
-          if [ "$DOCKER_BUILD_ENABLED" != "true" ] || [ ! -f "$DOCKERFILE_PATH" ]; then
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           matrix='[]'
           IFS=',' read -ra platforms <<< "$PLATFORMS"
           for platform in "${platforms[@]}"; do
@@ -208,8 +195,8 @@ jobs:
               linux/amd64) runner="$RUNS_ON" ;;
               linux/arm64)
                 if [ "$REPO_PRIVATE" = "true" ]; then
-                  echo "::warning::linux/arm64 is not available for private repositories (no free native arm64 runners). Skipping it and building only the remaining platforms."
-                  continue
+                  echo "::error::linux/arm64 is not available for private repositories (no free native arm64 runners)."
+                  exit 1
                 fi
                 runner='["ubuntu-24.04-arm"]'
                 ;;
@@ -221,14 +208,13 @@ jobs:
             echo "::error::No buildable platforms left in '$PLATFORMS' for this repository"
             exit 1
           fi
-          echo "enabled=true" >> "$GITHUB_OUTPUT"
           echo "matrix=$(jq -c '{include: .}' <<< "$matrix")" >> "$GITHUB_OUTPUT"
 
   # One job per platform on a native runner: build -> Trivy -> push by digest.
   docker_build:
     name: docker_build (${{ matrix.platform }})
     needs: [test, calculate_version, docker_plan]
-    if: ${{ needs.docker_plan.outputs.enabled == 'true' }}
+    if: ${{ inputs.docker-build-enabled }}
     strategy:
       fail-fast: false # report Trivy results for every platform even if another one failed
       matrix: ${{ fromJSON(needs.docker_plan.outputs.matrix) }}
@@ -396,6 +382,7 @@ jobs:
   docker_merge:
     needs: [calculate_version, docker_build]
     runs-on: ${{ fromJSON(inputs.runs-on) }}
+    if: ${{ inputs.docker-build-enabled }}
     permissions:
       contents: read
       packages: write
