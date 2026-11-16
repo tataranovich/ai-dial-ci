@@ -44,7 +44,7 @@ runs:
           latest=false
         tags: ${{ inputs.image-tags }}
       env:
-        DOCKER_METADATA_ANNOTATIONS_LEVELS: index
+        DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
     - name: Login to GitHub Container Registry
       uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
       with:

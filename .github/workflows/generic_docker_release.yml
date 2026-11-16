@@ -142,7 +142,6 @@ jobs:
         uses: tataranovich/ai-dial-ci/actions/docker_plan@main
         with:
           platforms: ${{ inputs.platforms }}
-          runs-on: ${{ inputs.runs-on }}
 
   # One job per platform on a native runner: build -> Trivy -> push by digest.
   docker_build:
