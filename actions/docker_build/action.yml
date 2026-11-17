@@ -200,7 +200,7 @@ runs:
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}
         build-args: ${{ inputs.build-args }}
-        outputs: type=image,"name=${{ inputs.image-name }},ghcr.io/${{ inputs.image-name }}",push-by-digest=true,name-canonical=true,push=true
+        outputs: type=image,"name=${{ inputs.image-name }},ghcr.io/${{ inputs.image-name }}",push=true
         secrets: ${{ inputs.gpr-password != '' && format('GPR_USERNAME={0}{1}GPR_PASSWORD={2}', inputs.gpr-username, fromJSON('"\n"'), inputs.gpr-password) || '' }}
       env:
         DOCKER_BUILD_RECORD_UPLOAD: false
