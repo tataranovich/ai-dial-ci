@@ -200,7 +200,10 @@ runs:
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}
         build-args: ${{ inputs.build-args }}
-        outputs: type=image,"name=${{ inputs.image-name }},ghcr.io/${{ inputs.image-name }}",push=true
+        # See https://github.com/docker/docs/blob/main/content/manuals/build/exporters/image-registry.md
+        # push-by-digest - Push image without name
+        # name-canonical - Add additional canonical name name@<digest>
+        outputs: type=image,"name=${{ inputs.image-name }},ghcr.io/${{ inputs.image-name }}",push-by-digest=true,name-canonical=true,push=true
         secrets: ${{ inputs.gpr-password != '' && format('GPR_USERNAME={0}{1}GPR_PASSWORD={2}', inputs.gpr-username, fromJSON('"\n"'), inputs.gpr-password) || '' }}
       env:
         DOCKER_BUILD_RECORD_UPLOAD: false
