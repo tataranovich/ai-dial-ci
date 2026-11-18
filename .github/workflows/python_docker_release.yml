@@ -150,7 +150,7 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
     outputs:
       next-version: ${{ steps.semantic_versioning.outputs.next-version }}
-      next-version-without-hyphens: ${{ steps.semantic_versioning.outputs.next-version-without-hyphens }}
+      next-version-python: ${{ steps.semantic_versioning.outputs.next-version-python }}
       is-latest: ${{ steps.semantic_versioning.outputs.is-latest }}
       latest-stable-tag: ${{ steps.semantic_versioning.outputs.latest-stable-tag }}
       changelog-mode: ${{ steps.semantic_versioning.outputs.changelog-mode }}
@@ -194,7 +194,7 @@ jobs:
       - name: Set version
         shell: bash
         run: |
-          sed -i "s/^version = .*/version = \"${{ needs.calculate_version.outputs.next-version-without-hyphens }}\"/g" pyproject.toml
+          sed -i "s/^version = .*/version = \"${{ needs.calculate_version.outputs.next-version-python }}\"/g" pyproject.toml
       - uses: tataranovich/ai-dial-ci/actions/docker_build@main
         with:
           maximize-build-space: ${{ inputs.maximize-build-space }}
@@ -256,7 +256,7 @@ jobs:
       - name: Set version
         shell: bash
         run: |
-          sed -i "s/^version = .*/version = \"${{ needs.calculate_version.outputs.next-version-without-hyphens }}\"/g" pyproject.toml
+          sed -i "s/^version = .*/version = \"${{ needs.calculate_version.outputs.next-version-python }}\"/g" pyproject.toml
       - uses: tataranovich/ai-dial-ci/actions/publish_tag_release@main
         if: ${{ startsWith(github.ref, 'refs/heads/release-') }}
         with:
