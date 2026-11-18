@@ -163,4 +163,3 @@ jobs:
           trivy-severity: ${{ inputs.trivy-severity }}
           trivy-severity-for-sarif: ${{ inputs.trivy-severity-for-sarif }}
           trivy-limit-severities-for-sarif: ${{ inputs.trivy-limit-severities-for-sarif }}
-
